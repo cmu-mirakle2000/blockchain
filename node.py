@@ -48,7 +48,6 @@ def new_transaction():
         sender=transaction['sender'],
         recipient=transaction['recipient'],
         amount=transaction['amount'],
-        source=values['sender'],
         signature=bytes.fromhex(transaction['signature'])
     )
 

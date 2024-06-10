@@ -5,6 +5,7 @@ from urllib.parse import urlparse
 from block import Block
 import json
 import threading
+import hashlib
 
 # Load keys from JSON file
 with open('keys.json', 'r') as f:
@@ -52,7 +53,8 @@ class Blockchain:
 
         self.log(f"New Block Forged: {block.to_dict()}")
 
-        self.broadcast_new_block(block)
+        # FIXME Remove this later
+        # self.broadcast_new_block(block)
 
         return block
 
@@ -80,7 +82,8 @@ class Blockchain:
 
         self.log(f"Transaction: {sender} sent {amount} to {recipient}")
 
-        self.broadcast_new_transaction(transaction, signature)
+        # FIXME Remove this later
+        # self.broadcast_new_transaction(transaction, signature)
 
         if len(self.current_transactions) >= 5:
             self.mine()
@@ -94,15 +97,16 @@ class Blockchain:
         if proof is None:
             return
 
+        new_block = self.new_block(proof)
+        # FIXME Remove this later
+        # self.broadcast_new_block(new_block)
+
         self.new_transaction(
             sender="Bank",
             recipient=self.nickname,
             amount=1,
             signature=b'',
         )
-
-        new_block = self.new_block(proof)
-        self.broadcast_new_block(new_block)
 
     @property
     def last_block(self):
@@ -135,7 +139,7 @@ class Blockchain:
 
     def broadcast_new_block(self, block):
         for node in self.nodes:
-            url = f'http://{node}/blocks/new'
+            url = f'{node}/blocks/new'
             try:
                 response = requests.post(url, json={'block': block.to_dict(), 'sender': self.nickname})
                 if response.status_code == 201:
@@ -147,7 +151,7 @@ class Blockchain:
 
     def broadcast_new_transaction(self, transaction, signature):
         for node in self.nodes:
-            url = f'http://{node}/transactions/new'
+            url = f'{node}/transactions/new'
             try:
                 response = requests.post(url, json={
                     'transaction': {
@@ -203,6 +207,6 @@ class Blockchain:
         print(log_message)
         if self.master_controller:
             try:
-                requests.post(f'http://{self.master_controller}/log', json={'message': log_message})
+                requests.post(f'{self.master_controller}/log', json={'message': log_message})
             except Exception as e:
                 print(f"Failed to send log to master controller: {e}")

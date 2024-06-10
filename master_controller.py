@@ -8,6 +8,9 @@ master_controller_url = None
 nodes = []
 difficulty = None
 node_nicknames = {}
+import logging
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 
 @app.route('/genesis/<nickname>', methods=['POST'])
 def genesis(nickname):
@@ -78,7 +81,7 @@ def configure():
 
     for node in nodes:
         try:
-            response = requests.post(f'http://{node}/configure', json=configuration)
+            response = requests.post(f'{node}/configure', json=configuration)
             if response.status_code == 201:
                 response_data = response.json()
                 node_nickname = response_data.get('nickname')
@@ -111,7 +114,7 @@ def post_transaction(nickname):
     }
 
     try:
-        response = requests.post(f'http://{node_url}/transactions/new', json={'transaction': transaction, 'sender': 'MasterController'})
+        response = requests.post(f'{node_url}/transactions/new', json={'transaction': transaction, 'sender': 'MasterController'})
         if response.status_code == 201:
             return jsonify({'status': 'Transaction posted'}), 201
         else:
