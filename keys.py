@@ -1,0 +1,26 @@
+HARDCODED_KEYS = {
+    'Alice': {
+        'private_key': """-----BEGIN EC PRIVATE KEY-----
+MHcCAQEEIC/GBdzERzGLqnh8ZoNmfDzoLCaB3TI8Q+XQZwh3syjooAoGCCqGSM49
+AwEHoUQDQgAEE2/B7QaGHT3+jC0Whkp7bUhnTFMvOhXZUN+MFkphGUNVEfblhPMD
+PO0hYhUFLZzZyKFOG3Ed5c/d7I5NyRjCxA==
+-----END EC PRIVATE KEY-----""",
+        'public_key': """-----BEGIN PUBLIC KEY-----
+MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEV2orIW5GRQQ0lOS9X4cFsvFbI8ls4+t7
+NShCbVpkZZP76P/gSHB4hP0OtSyF56IWW07IbSfr3FoE9EPdvUyCIc0i3HC92nFq
+Duz9m0uAyq+HiFZ3V/srHiqk1LbKoJAb
+-----END PUBLIC KEY-----"""
+    },
+    'Bob': {
+        'private_key': """-----BEGIN EC PRIVATE KEY-----
+MHcCAQEEIKOr6YF9TzRaLMV+cId/OWwnUyNSoD2yQPOB0oQsh5EsoAoGCCqGSM49
+AwEHoUQDQgAEUnGgq5ZC3RuByDRkRu8e1B28DwW9s5YLBWcV4ocS45b/Uyo/y04u
+k4pxYZdJH+Z8+UlM6KkNYvG0v2IS1HRQtg==
+-----END EC PRIVATE KEY-----""",
+        'public_key': """-----BEGIN PUBLIC KEY-----
+MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAEUnGgq5ZC3RuByDRkRu8e1B28DwW9s5YL
+BWcV4ocS45b/Uyo/y04uk4pxYZdJH+Z8+UlM6KkNYvG0v2IS1HRQtg==
+-----END PUBLIC KEY-----"""
+    },
+    # Add other users similarly
+}
