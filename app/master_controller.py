@@ -164,10 +164,11 @@ def get_configuration():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Master Controller for Blockchain Nodes')
-    parser.add_argument('ip', type=str, help='IP address to bind the master controller')
+    parser.add_argument('ip', type=str, help='IP address to publish for master controller')
+    parser.add_argument('bind', type=str, help='IP address to bind the master controller')
     parser.add_argument('port', type=int, help='Port to bind the master controller')
     args = parser.parse_args()
 
     master_controller_url = f"http://{args.ip}:{args.port}"
 
-    app.run(host=args.ip, port=args.port)
+    app.run(host=args.bind, port=args.port)

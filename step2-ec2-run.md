@@ -40,21 +40,16 @@
    ```
 
 ### Step 4: Configure Gunicorn
-1. **Install Gunicorn**:
-   ```bash
-   pip install gunicorn
-   ```
 
-2. **Test Gunicorn with your Flask app**:
+1**Test your Flask app**:
    ```bash
-     gunicorn --bind 0.0.0.0:8000 app:app
+     cd app
+     python node.py 0.0.0.0 8000 Name
    ```
 
 4. Test your app from another terminal (Change the IP address)
 
-   ```
-   curl -X POST http://192.168.2.122:8000/data -H "Content-Type: application/json" -d '{"key": "value"}'
-   
+   ``` 
    curl http://192.168.145.122:8000/data
    ```
 
