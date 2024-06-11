@@ -25,6 +25,7 @@
    ```bash
    git clone https://github.com/cmu-mirakle2000/blockchain.git
    cd blockchain
+   git checkout Workshop2
    ```
 
 2. **Create and activate a virtual environment**:
