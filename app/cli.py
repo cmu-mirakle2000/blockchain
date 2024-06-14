@@ -6,7 +6,7 @@ from ecdsa import SigningKey
 MASTER_CONTROLLER_URL = "http://127.0.0.1:5000"
 
 # Load keys from JSON file
-with open('keys.json', 'r') as f:
+with open('../keys.json', 'r') as f:
     HARDCODED_KEYS = json.load(f)
 
 def post_log(message):

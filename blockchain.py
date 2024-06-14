@@ -127,6 +127,7 @@ class Blockchain:
     def valid_proof(self, last_proof, proof):
         guess = f'{last_proof}{proof}'.encode()
         guess_hash = hashlib.sha256(guess).hexdigest()
+        print(guess_hash)
         return guess_hash[:self.difficulty] == "0" * self.difficulty
 
     def register_node(self, address):
@@ -186,14 +187,15 @@ class Blockchain:
         self.log(f"Block added to chain: {block.to_dict()}")
         self.mining_event.clear()
 
-    def configure(self, nodes, master_controller, difficulty):
+    def configure(self, nodes, master_controller, difficulty, reset=0):
         self.master_controller = master_controller
         self.difficulty = difficulty
 
-        # Reset blockchain
-        self.chain = []
-        self.current_transactions = []
-        self.new_block(previous_hash='1', proof=100)
+        if reset == 1:
+            # Reset blockchain
+            self.chain = []
+            self.current_transactions = []
+            self.new_block(previous_hash='1', proof=100)
 
         # Register nodes
         self.nodes = set()

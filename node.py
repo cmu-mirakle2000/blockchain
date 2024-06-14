@@ -35,7 +35,7 @@ def mine():
     }
     return jsonify(response), 200
 
-@app.route('/transactions/new', methods=['POST'])
+@app.route('/transactions', methods=['POST'])
 def new_transaction():
     values = request.get_json()
 
@@ -71,15 +71,16 @@ def get_users():
 def configure():
     values = request.get_json()
 
-    required = ['nodes', 'master_controller', 'difficulty']
+    required = ['nodes', 'master_controller', 'difficulty', 'reset']
     if not all(k in values for k in required):
         return 'Missing values', 400
 
     nodes = values['nodes']
     master_controller = values['master_controller']
     difficulty = values['difficulty']
+    reset = values['reset']
 
-    blockchain.configure(nodes, master_controller, difficulty)
+    blockchain.configure(nodes, master_controller, difficulty, reset)
 
     response = {
         'message': 'Configuration updated',
@@ -125,13 +126,13 @@ def receive_block():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Blockchain Node')
-    parser.add_argument('ip', type=str, help='IP address to bind the node')
-    parser.add_argument('port', type=int, help='Port to bind the node')
+    # parser.add_argument('ip', type=str, help='IP address to bind the node')
+    # parser.add_argument('port', type=int, help='Port to bind the node')
     parser.add_argument('nickname', type=str, help='Nickname of the node')
-    parser.add_argument('--type', type=str, default='full', choices=['full', 'lightweight'], help='Type of the node (full or lightweight)')
+    # parser.add_argument('--type', type=str, default='full', choices=['full', 'lightweight'], help='Type of the node (full or lightweight)')
     args = parser.parse_args()
 
-    blockchain = Blockchain(args.nickname, f"{args.ip}:{args.port}")
+    blockchain = Blockchain(args.nickname, f"127.0.0.1:8000")
 
-    app.run(host=args.ip, port=args.port)
+    app.run(host="127.0.0.1", port=8000)
 
