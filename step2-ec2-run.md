@@ -62,8 +62,12 @@ Replace `YourName` with a name from the `keys.json` file
    Switch to your project folder
       ```bash
       cd blockchain
+      source venv/bin/activate
       ```
 2. **Reset your blockchain and mine a genesis block**
+   
+   It is important to do this before you do any of the following commands
+
       ```bash 
       python cli.py reset
       ```
@@ -71,7 +75,7 @@ Replace `YourName` with a name from the `keys.json` file
       ```bash
       python cli.py chain
       ```
-4. **List current users**
+4. **List current users and their wallets**
       ```bash
       python cli.py users
       ```
@@ -90,6 +94,6 @@ Replace `YourName` with a name from the `keys.json` file
       python cli.py difficulty 2
       ```
 
-   
+You can reset the blockchain and rerun commands 3 to 6 any time. 
 
 
