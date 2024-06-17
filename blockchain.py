@@ -13,7 +13,7 @@ with open('keys.json', 'r') as f:
 
 
 class Blockchain:
-    def __init__(self, nickname, node_address):
+    def __init__(self, nickname, node_address, network_node):
         self.chain = []
         self.current_transactions = []
         self.nodes = set()
@@ -21,6 +21,7 @@ class Blockchain:
         self.mining_event = threading.Event()
         self.nickname = nickname
         self.node_address = node_address
+        self.network_node = network_node
         self.master_controller = None
         self.difficulty = 2
 
@@ -55,11 +56,12 @@ class Blockchain:
         self.log(f"New Block Forged: {block.to_dict()}")
 
         # FIXME Remove this later
-        # self.broadcast_new_block(block)
+        if self.network_node:
+            self.broadcast_new_block(block)
 
         return block
 
-    def new_transaction(self, sender, recipient, amount, signature):
+    def new_transaction(self, sender, recipient, amount, signature, broadcast=False):
         # Skip verification if it is a reward transaction
         if sender != "Bank":
             if not self.verify_transaction(sender, recipient, amount, signature):
@@ -83,8 +85,8 @@ class Blockchain:
 
         self.log(f"Transaction: {sender} sent {amount} to {recipient}")
 
-        # FIXME Remove this later
-        # self.broadcast_new_transaction(transaction, signature)
+        if self.network_node and broadcast:
+            self.broadcast_new_transaction(transaction, signature)
 
         if len(self.current_transactions) >= 5:
             self.mine()
@@ -96,7 +98,7 @@ class Blockchain:
             'index': len(self.chain) + 1,
             'timestamp': time(),
             'previous_hash': Block.hash(self.chain[-1]),
-            'nonce' : 0,
+            'nonce': 0,
             'merkle_root': Block.merkle_root(self.current_transactions),
         }
 
@@ -115,6 +117,7 @@ class Blockchain:
             recipient=self.nickname,
             amount=1,
             signature=b'',
+            broadcast=True
         )
 
     @property
@@ -150,7 +153,7 @@ class Blockchain:
 
     def broadcast_new_block(self, block):
         for node in self.nodes:
-            url = f'{node}/blocks/new'
+            url = f'http://{node}/blocks/new'
             try:
                 response = requests.post(url, json={'block': block.to_dict(), 'sender': self.nickname})
                 if response.status_code == 201:
@@ -162,7 +165,7 @@ class Blockchain:
 
     def broadcast_new_transaction(self, transaction, signature):
         for node in self.nodes:
-            url = f'{node}/transactions/new'
+            url = f'http://{node}/transactions'
             try:
                 response = requests.post(url, json={
                     'transaction': {
@@ -213,7 +216,14 @@ class Blockchain:
             self.register_node(node)
 
         self.log(f"Blockchain {'reset and ' if reset == 1 else ''}reconfigured with difficulty {difficulty}")
+
     def reset(self):
+        self.chain = []
+        self.current_transactions = []
+        if not self.network_node:
+            self.new_block(previous_hash='1', nonce=100)
+
+    def genesis(self):
         self.chain = []
         self.current_transactions = []
         self.new_block(previous_hash='1', nonce=100)

@@ -21,7 +21,7 @@ python cli.py <command> [arguments]
 
 **Example**:
 ```sh
-python cli.py post_log "This is a log message"
+python mcli.py post_log "This is a log message"
 ```
 
 ### 2. Add Node
@@ -34,7 +34,7 @@ python cli.py post_log "This is a log message"
 
 **Example**:
 ```sh
-python cli.py add_node "http://localhost:5001"
+python mcli.py add_node "http://localhost:5001"
 ```
 
 ### 3. Set Difficulty
@@ -47,7 +47,7 @@ python cli.py add_node "http://localhost:5001"
 
 **Example**:
 ```sh
-python cli.py set_difficulty 4
+python mcli.py set_difficulty 4
 ```
 
 ### 4. Configure
@@ -57,7 +57,7 @@ python cli.py set_difficulty 4
 
 **Example**:
 ```sh
-python cli.py configure
+python mcli.py configure
 ```
 
 ### 5. Post Transaction
@@ -74,7 +74,7 @@ python cli.py configure
 
 **Example**:
 ```sh
-python cli.py post_transaction Node1 Alice Bob 100 signature_hex
+python mcli.py post_transaction Node1 Alice Bob 100 signature_hex
 ```
 
 ### 6. Get Users
@@ -87,7 +87,7 @@ python cli.py post_transaction Node1 Alice Bob 100 signature_hex
 
 **Example**:
 ```sh
-python cli.py get_users Node1
+python mcli.py get_users Node1
 ```
 
 ### 7. Get Blockchain
@@ -100,7 +100,7 @@ python cli.py get_users Node1
 
 **Example**:
 ```sh
-python cli.py get_chain Node1
+python mcli.py get_chain Node1
 ```
 
 ### 8. Get Configuration
@@ -110,5 +110,5 @@ python cli.py get_chain Node1
 
 **Example**:
 ```sh
-python cli.py get_configuration
+python mcli.py get_configuration
 ```

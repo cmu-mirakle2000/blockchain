@@ -69,21 +69,21 @@ Replace `YourName` with a name from the `keys.json` file
    It is important to do this before you do any of the following commands
 
       ```bash 
-      python cli.py reset
+      python mcli.py reset
       ```
 3. **See the current chain of blocks**
       ```bash
-      python cli.py chain
+      python mcli.py chain
       ```
 4. **List current users and their wallets**
       ```bash
-      python cli.py users
+      python mcli.py users
       ```
 5. **Send transactions to the blockchain.**
 
    Replace Sender and Recipient with names from the users list above
       ```bash
-      python cli.py transaction <Sender> <Recipient> 4
+      python mcli.py transaction <Sender> <Recipient> 4
       ```
    Send five transactions to mine a block. You can see the hashes being generated and validated by the proof of work function. 
 
@@ -91,7 +91,7 @@ Replace `YourName` with a name from the `keys.json` file
    
    After you change difficulty, the blockchain resets. Send new transactions to mine a block. Keep incrementing the difficulty until you see the proof of work take some meaningful time (5 to 10 seconds). 
       ```bash
-      python cli.py difficulty 2
+      python mcli.py difficulty 2
       ```
 
 You can reset the blockchain and rerun commands 3 to 6 any time. 

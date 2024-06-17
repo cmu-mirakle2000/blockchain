@@ -6,20 +6,84 @@ import requests
 app = Flask(__name__)
 master_controller_url = None
 nodes = []
-difficulty = None
+difficulty = 3
 node_nicknames = {}
-import logging
-log = logging.getLogger('werkzeug')
-log.setLevel(logging.ERROR)
+
+
+# import logging
+# log = logging.getLogger('werkzeug')
+# log.setLevel(logging.ERROR)
+
+
+@app.route('/configure', methods=['POST'])
+def configure():
+    if not nodes or difficulty is None:
+        return jsonify({'status':'Configuration incomplete','nodes':nodes,'difficulty':difficulty}), 400
+
+    global node_nicknames
+
+    configuration = {
+        'nodes': nodes,
+        'master_controller': master_controller_url,
+        'difficulty': difficulty,
+        'reset': 0
+    }
+
+    for node in nodes:
+        try:
+            response = requests.post(f'{node}/configure', json=configuration)
+            if response.status_code == 201:
+                response_data = response.json()
+                node_nickname = response_data.get('nickname')
+                node_nicknames[node_nickname] = node
+                print(f"Configuration sent to node {node}, nickname: {node_nickname}")
+            else:
+                print(f"Failed to configure node {node}: {response.status_code}")
+        except Exception as e:
+            print(f"Error configuring node {node}: {e}")
+
+    return jsonify({'status': 'configuration sent to nodes', 'nodes': node_nicknames}), 201
+
+
+
+@app.route('/reset', methods=['POST'])
+def reset():
+    if not nodes or difficulty is None:
+        return jsonify({'status':'Configuration incomplete','nodes':nodes,'difficulty':difficulty}), 400
+
+    global node_nicknames
+
+    configuration = {
+        'nodes': nodes,
+        'master_controller': master_controller_url,
+        'difficulty': difficulty,
+        'reset': 1
+    }
+
+    for node in nodes:
+        try:
+            response = requests.post(f'{node}/configure', json=configuration)
+            if response.status_code == 201:
+                response_data = response.json()
+                node_nickname = response_data.get('nickname')
+                node_nicknames[node_nickname] = node
+                print(f"Configuration sent to node {node}, nickname: {node_nickname}")
+            else:
+                print(f"Failed to configure node {node}: {response.status_code}")
+        except Exception as e:
+            print(f"Error configuring node {node}: {e}")
+
+    return jsonify({'status': 'configuration sent to nodes', 'nodes': node_nicknames, 'configuration':configuration}), 201
+
 
 @app.route('/genesis/<nickname>', methods=['POST'])
 def genesis(nickname):
     node_url = node_nicknames.get(nickname)
     if not node_url:
-        return 'Invalid node nickname', 400
+        return jsonify('Invalid node nickname'), 400
 
     try:
-        response = requests.post(f'http://{node_url}/genesis', json={})
+        response = requests.post(f'{node_url}/genesis', json={})
         if response.status_code == 201:
             return jsonify(response.json()), 201
         else:
@@ -42,6 +106,7 @@ def receive_log():
 
     return jsonify({'status': 'received'}), 201
 
+
 @app.route('/add_node', methods=['POST'])
 def add_node():
     values = request.get_json()
@@ -53,6 +118,24 @@ def add_node():
     node = values['node']
     nodes.append(node)
     return jsonify({'status': 'node added', 'nodes': nodes}), 201
+
+
+@app.route('/remove_node', methods=['POST'])
+def remove_node():
+    values = request.get_json()
+
+    required = ['node']
+    if not all(k in values for k in required):
+        return jsonify('Missing values'), 400
+
+    node = values['node']
+
+    if node not in nodes:
+        return jsonify({'status': 'Node not in list', 'nodes': nodes}), 400
+
+    nodes.remove(node)
+    return jsonify({'status': 'node removed', 'nodes': nodes}), 201
+
 
 @app.route('/set_difficulty', methods=['POST'])
 def set_difficulty():
@@ -66,33 +149,6 @@ def set_difficulty():
     difficulty = values['difficulty']
     return jsonify({'status': 'difficulty set', 'difficulty': difficulty}), 201
 
-@app.route('/configure', methods=['POST'])
-def configure():
-    if not nodes or difficulty is None:
-        return 'Configuration incomplete', 400
-
-    global node_nicknames
-
-    configuration = {
-        'nodes': nodes,
-        'master_controller': master_controller_url,
-        'difficulty': difficulty
-    }
-
-    for node in nodes:
-        try:
-            response = requests.post(f'{node}/configure', json=configuration)
-            if response.status_code == 201:
-                response_data = response.json()
-                node_nickname = response_data.get('nickname')
-                node_nicknames[node_nickname] = node
-                print(f"Configuration sent to node {node}, nickname: {node_nickname}")
-            else:
-                print(f"Failed to configure node {node}: {response.status_code}")
-        except Exception as e:
-            print(f"Error configuring node {node}: {e}")
-
-    return jsonify({'status': 'configuration sent to nodes', 'nodes': node_nicknames}), 201
 
 @app.route('/post_transaction/<nickname>', methods=['POST'])
 def post_transaction(nickname):
@@ -100,7 +156,7 @@ def post_transaction(nickname):
 
     required = ['sender', 'recipient', 'amount', 'signature']
     if not all(k in values for k in required):
-        return 'Missing values', 400
+        return jsonify('Missing values'), 400
 
     node_url = node_nicknames.get(nickname)
     if not node_url:
@@ -114,13 +170,15 @@ def post_transaction(nickname):
     }
 
     try:
-        response = requests.post(f'{node_url}/transactions/new', json={'transaction': transaction, 'sender': 'MasterController'})
+        response = requests.post(f'{node_url}/transactions',
+                                 json={'transaction': transaction, 'sender': 'MasterController'})
         if response.status_code == 201:
             return jsonify({'status': 'Transaction posted'}), 201
         else:
             return jsonify({'status': 'Failed to post transaction', 'error': response.status_code}), 400
     except Exception as e:
         return jsonify({'status': 'Failed to post transaction', 'error': str(e)}), 400
+
 
 @app.route('/get_users/<nickname>', methods=['GET'])
 def get_users(nickname):
@@ -137,6 +195,7 @@ def get_users(nickname):
     except Exception as e:
         return jsonify({'status': 'Failed to get users', 'error': str(e)}), 400
 
+
 @app.route('/get_chain/<nickname>', methods=['GET'])
 def get_chain(nickname):
     node_url = node_nicknames.get(nickname)
@@ -152,6 +211,7 @@ def get_chain(nickname):
     except Exception as e:
         return jsonify({'status': 'Failed to get chain', 'error': str(e)}), 400
 
+
 @app.route('/configuration', methods=['GET'])
 def get_configuration():
     global nodes, difficulty, node_nicknames
@@ -161,6 +221,7 @@ def get_configuration():
         'difficulty': difficulty,
         'node_nicknames': node_nicknames
     }), 200
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Master Controller for Blockchain Nodes')

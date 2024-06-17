@@ -22,7 +22,7 @@ python cli.py <command> [arguments]
 
 **Example**:
 ```sh
-python cli.py difficulty 4
+python mcli.py difficulty 4
 ```
 
 ### 2 Reset
@@ -32,7 +32,7 @@ python cli.py difficulty 4
 
 **Example**:
 ```sh
-python cli.py reset
+python mcli.py reset
 ```
 
 ### 3 Post Transaction
@@ -47,7 +47,7 @@ python cli.py reset
 
 **Example**:
 ```sh
-python cli.py transaction Alice Bob 100
+python mcli.py transaction Alice Bob 100
 ```
 
 ### 4 Get Users
@@ -58,7 +58,7 @@ python cli.py transaction Alice Bob 100
 
 **Example**:
 ```sh
-python cli.py users
+python mcli.py users
 ```
 
 ### 5 Get Blockchain
@@ -68,7 +68,7 @@ python cli.py users
 
 **Example**:
 ```sh
-python cli.py chain
+python mcli.py chain
 ```
 
     
