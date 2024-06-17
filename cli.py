@@ -9,7 +9,7 @@ local_controller_url = None
 nodes = [
     node_url
 ]
-difficulty = 1
+difficulty = 2
 node_nickname = ""
 
 # Load keys from JSON file

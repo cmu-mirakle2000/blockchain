@@ -13,7 +13,7 @@ blockchain = None
 @app.route('/mine', methods=['GET'])
 def mine():
     last_block = blockchain.last_block
-    last_proof = last_block.proof
+    last_proof = last_block.nonce
     proof = blockchain.proof_of_work(last_proof)
 
     blockchain.new_transaction(
@@ -29,7 +29,7 @@ def mine():
         'message': "New Block Forged",
         'index': block.index,
         'transactions': block.transactions,
-        'proof': block.proof,
+        'proof': block.nonce,
         'previous_hash': block.previous_hash,
         'merkle_root': block.merkle_root,
     }
@@ -114,7 +114,7 @@ def receive_block():
         index=block_data['index'],
         timestamp=block_data['timestamp'],
         transactions=block_data['transactions'],
-        proof=block_data['proof'],
+        nonce=block_data['proof'],
         previous_hash=block_data['previous_hash'],
         merkle_root=block_data['merkle_root']
     )
@@ -133,6 +133,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     blockchain = Blockchain(args.nickname, f"127.0.0.1:8000")
+    blockchain.reset()
 
     app.run(host="127.0.0.1", port=8000)
 

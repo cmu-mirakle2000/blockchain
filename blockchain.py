@@ -11,6 +11,7 @@ import hashlib
 with open('keys.json', 'r') as f:
     HARDCODED_KEYS = json.load(f)
 
+
 class Blockchain:
     def __init__(self, nickname, node_address):
         self.chain = []
@@ -21,14 +22,14 @@ class Blockchain:
         self.nickname = nickname
         self.node_address = node_address
         self.master_controller = None
-        self.difficulty = 4
+        self.difficulty = 2
 
         # Comment out genesis block creation, will be handled manually
         # self.new_block(previous_hash='1', proof=100)
 
     def create_users(self):
         users = {user: {'balance': 1000} for user in HARDCODED_KEYS.keys()}
-        users["Bank"] = {'balance': float('inf')}  # Bank user with infinite balance
+        users["Bank"] = {'balance': 2000000}  # Bank user with maximum currency
 
         for user, keys in HARDCODED_KEYS.items():
             if user in users:
@@ -37,12 +38,12 @@ class Blockchain:
 
         return users
 
-    def new_block(self, proof, previous_hash=None):
+    def new_block(self, nonce, previous_hash=None):
         block = Block(
             index=len(self.chain) + 1,
             timestamp=time(),
             transactions=self.current_transactions,
-            proof=proof,
+            nonce=nonce,
             previous_hash=previous_hash or Block.hash(self.chain[-1]),
             merkle_root=Block.merkle_root(self.current_transactions)
         )
@@ -88,12 +89,20 @@ class Blockchain:
         if len(self.current_transactions) >= 5:
             self.mine()
 
-        return self.last_block.index + 1
+        return self.last_block.header['index'] + 1
 
     def mine(self):
+        new_header = {
+            'index': len(self.chain) + 1,
+            'timestamp': time(),
+            'previous_hash': Block.hash(self.chain[-1]),
+            'nonce' : 0,
+            'merkle_root': Block.merkle_root(self.current_transactions),
+        }
+
         last_block = self.last_block
-        last_proof = last_block.proof
-        proof = self.proof_of_work(last_proof)
+        last_proof = last_block.header['nonce']
+        proof = self.proof_of_work(new_header)
         if proof is None:
             return
 
@@ -112,22 +121,23 @@ class Blockchain:
     def last_block(self):
         return self.chain[-1]
 
-    def proof_of_work(self, last_proof):
-        proof = 0
+    def proof_of_work(self, header):
+        nonce = 0
         self.log("Starting proof of work...")
-        while self.valid_proof(last_proof, proof) is False:
+        while self.valid_proof(header, nonce) is False:
             if self.mining_event.is_set():
                 self.log("Mining stopped due to new block received.")
                 return None
-            proof += 1
+            nonce += 1
 
-        self.log(f"Proof of work found: {proof}")
-        return proof
+        self.log(f"Proof of work found: {nonce}")
+        return nonce
 
-    def valid_proof(self, last_proof, proof):
-        guess = f'{last_proof}{proof}'.encode()
+    def valid_proof(self, header, nonce):
+        header['nonce'] = nonce
+        guess = f'{json.dumps(header)}'.encode()
         guess_hash = hashlib.sha256(guess).hexdigest()
-        print(guess_hash)
+        print(guess_hash, self.difficulty)
         return guess_hash[:self.difficulty] == "0" * self.difficulty
 
     def register_node(self, address):
@@ -195,14 +205,18 @@ class Blockchain:
             # Reset blockchain
             self.chain = []
             self.current_transactions = []
-            self.new_block(previous_hash='1', proof=100)
+            self.new_block(previous_hash='1', nonce=100)
 
         # Register nodes
         self.nodes = set()
         for node in nodes:
             self.register_node(node)
 
-        self.log(f"Blockchain reset and reconfigured with difficulty {difficulty}")
+        self.log(f"Blockchain {'reset and ' if reset == 1 else ''}reconfigured with difficulty {difficulty}")
+    def reset(self):
+        self.chain = []
+        self.current_transactions = []
+        self.new_block(previous_hash='1', nonce=100)
 
     def log(self, message):
         log_message = f"[{self.nickname}] {message}"

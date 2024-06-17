@@ -15,7 +15,7 @@ python cli.py <command> [arguments]
 ### 1 Set Difficulty
 
 **Command**: `difficulty`  
-**Description**: Sets the mining difficulty for the nodes and resets the blockchain.
+**Description**: Sets the mining difficulty for the nodes the blockchain.
 
 **Arguments**:
 - `difficulty` (int): The difficulty level for mining.
