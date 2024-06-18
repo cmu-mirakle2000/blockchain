@@ -39,7 +39,7 @@ class Blockchain:
 
         return users
 
-    def new_block(self, nonce, previous_hash=None):
+    def new_block(self, nonce, previous_hash=None, broadcast=False):
         block = Block(
             index=len(self.chain) + 1,
             timestamp=time(),
@@ -56,7 +56,7 @@ class Blockchain:
         self.log(f"New Block Forged: {block.to_dict()}")
 
         # FIXME Remove this later
-        if self.network_node:
+        if self.network_node and broadcast:
             self.broadcast_new_block(block)
 
         return block
@@ -108,7 +108,7 @@ class Blockchain:
         if proof is None:
             return
 
-        new_block = self.new_block(proof)
+        new_block = self.new_block(proof, broadcast=True)
         # FIXME Remove this later
         # self.broadcast_new_block(new_block)
 
@@ -226,7 +226,7 @@ class Blockchain:
     def genesis(self):
         self.chain = []
         self.current_transactions = []
-        self.new_block(previous_hash='1', nonce=100)
+        self.new_block(previous_hash='1', nonce=100, broadcast=True)
 
     def log(self, message):
         log_message = f"[{self.nickname}] {message}"
