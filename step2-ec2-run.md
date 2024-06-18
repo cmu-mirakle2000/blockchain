@@ -44,9 +44,11 @@
 
 Replace `YourName` with a name from the `keys.json` file
 
+For type, use `single` or `network`
+ 
    ```bash
      cd app
-     python node.py <YourName>
+     python node.py <type> <YourName>
    ```
 
 ### Step 5: Test with the CLI

@@ -127,6 +127,11 @@ def receive_block():
         transactions=block_data['transactions']
     )
 
+    # TODO
+    # Confirm the Merkle Root is valid for the transactions
+    # Match the previous_hash with the actual block in YOUR blockchain
+    # Confirm that proof of work hash is valid for new block header with the given nonce
+
     blockchain.add_block(block)
 
     response = {'message': 'Block added to the chain'}
