@@ -187,7 +187,7 @@ def get_users(nickname):
         return 'Invalid node nickname', 400
 
     try:
-        response = requests.get(f'http://{node_url}/users')
+        response = requests.get(f'{node_url}/users')
         if response.status_code == 200:
             return jsonify(response.json()), 200
         else:
@@ -203,7 +203,7 @@ def get_chain(nickname):
         return 'Invalid node nickname', 400
 
     try:
-        response = requests.get(f'http://{node_url}/chain')
+        response = requests.get(f'{node_url}/chain')
         if response.status_code == 200:
             return jsonify(response.json()), 200
         else:

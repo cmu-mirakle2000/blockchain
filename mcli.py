@@ -76,13 +76,13 @@ def post_transaction(nickname, sender, recipient, amount):
 def get_users(nickname):
     url = f"{MASTER_CONTROLLER_URL}/get_users/{nickname}"
     response = requests.get(url)
-    print(response.json())
+    print(json.dumps(response.json(), indent=4))
 
 
 def get_chain(nickname):
     url = f"{MASTER_CONTROLLER_URL}/get_chain/{nickname}"
     response = requests.get(url)
-    print(response.json())
+    print(json.dumps(response.json(), indent=4))
 
 
 def get_configuration():
