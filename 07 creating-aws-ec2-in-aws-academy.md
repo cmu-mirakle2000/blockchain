@@ -1,6 +1,6 @@
-# Create an EC2 Instance
+# Creating an EC2 Instance in AWS Academy Labs
 
-### Task 1. Create an EC2 Instance
+## Task 1. Create an EC2 Instance
 
 1. Choose the **Services** menu, locate the **Compute** services, and select **EC2**.
 
@@ -88,3 +88,13 @@ The new inbound HTTP rule creates an entry for IPv4 IP (0.0.0.0/0) and IPv6 IP a
    xattr -c ~/labsuser.pem
    ```
 
+
+## Task 4. Connect to EC2 Instance
+
+1. **Connect to your EC2 instance**:
+
+   - Open Terminal application on your computer
+   - Use the following command to connect to your instance (change the IP address):
+     ```bash
+     ssh -i ~/labsuser.pem ec2-user@192.168.2.16
+     ```

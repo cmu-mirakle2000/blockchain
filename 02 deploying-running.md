@@ -1,12 +1,13 @@
 
 
-### Step 1: Set up an EC2 Instance
+### Step 1: Connect to Your Server
 
-1. **Connect to your EC2 instance**:
+1. **Connect to your server**:
 
    - Open Terminal application on your computer
-   - Use the following command to connect to your instance (change the IP address):
+   - Use SSH to connect to your server
      ```bash
+     # Example only. Use the appropriate command for your server
      ssh -i ~/labsuser.pem ec2-user@192.168.2.16
      ```
 
@@ -44,7 +45,7 @@
 
 Replace `YourName` with a name from the `keys.json` file
 
-For type, use `single` or `network`
+For type, use `single` or `network`. For initial tests, use `single'
  
    ```bash
      cd app
@@ -54,11 +55,11 @@ For type, use `single` or `network`
 ### Step 5: Test with the CLI
 
 
-
 1. **Open a new Terminal window on your computer**
    
    Use the following command to connect to your instance (change the IP address):
      ```bash
+     # Example
      ssh -i ~/labsuser.pem ec2-user@192.168.2.16
      ```
    Switch to your project folder
@@ -71,21 +72,21 @@ For type, use `single` or `network`
    It is important to do this before you do any of the following commands
 
       ```bash 
-      python mcli.py reset
+      python cli.py reset
       ```
 3. **See the current chain of blocks**
       ```bash
-      python mcli.py chain
+      python cli.py chain
       ```
 4. **List current users and their wallets**
       ```bash
-      python mcli.py users
+      python cli.py users
       ```
 5. **Send transactions to the blockchain.**
 
    Replace Sender and Recipient with names from the users list above
       ```bash
-      python mcli.py transaction <Sender> <Recipient> 4
+      python cli.py transaction <Sender> <Recipient> 4
       ```
    Send five transactions to mine a block. You can see the hashes being generated and validated by the proof of work function. 
 
@@ -93,7 +94,7 @@ For type, use `single` or `network`
    
    After you change difficulty, the blockchain resets. Send new transactions to mine a block. Keep incrementing the difficulty until you see the proof of work take some meaningful time (5 to 10 seconds). 
       ```bash
-      python mcli.py difficulty 2
+      python cli.py difficulty 2
       ```
 
 You can reset the blockchain and rerun commands 3 to 6 any time. 
