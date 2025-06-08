@@ -91,8 +91,6 @@ class Blockchain:
         if len(self.current_transactions) >= 5:
             self.mine()
 
-        return self.last_block.header['index'] + 1
-
     def mine(self):
         new_header = {
             'index': len(self.chain) + 1,

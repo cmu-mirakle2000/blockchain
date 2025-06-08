@@ -3,7 +3,7 @@ import requests
 import json
 from ecdsa import SigningKey
 
-node_url = "http://127.0.0.1:8000"
+node_url = "http://127.0.0.1:8004"
 
 local_controller_url = None
 nodes = [

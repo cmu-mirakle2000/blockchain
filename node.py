@@ -74,15 +74,16 @@ def new_transaction():
 
     sender = values['sender']
     transaction = values['transaction']
-    index = blockchain.new_transaction(
+    blockchain.new_transaction(
         sender=transaction['sender'],
         recipient=transaction['recipient'],
         amount=transaction['amount'],
         signature=bytes.fromhex(transaction['signature']),
-        broadcast=True if sender == 'MasterController' else False
+        # broadcast=True if sender == 'MasterController' else False
+        broadcast=True if network_node and sender=="" else False
     )
 
-    response = {'message': f'Transaction will be added to Block {index}'}
+    response = {'message': f'Transaction will be added to next Block'}
     return jsonify(response), 201
 
 @app.route('/chain', methods=['GET'])
