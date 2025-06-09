@@ -4,16 +4,22 @@ import json
 from ecdsa import SigningKey
 import shlex
 import sys
+
 # Enable up-arrow history on Mac/Linux, do nothing on Windows
 try:
     import readline
 except ImportError:
-    pass  # readline not available (e.g., on Windows), so skip
+    pass
 
+# Defaults
+DEFAULT_IP = "127.0.0.1"
+DEFAULT_PORT = 8004
 
-node_url = "http://127.0.0.1:8004"
+node_ip = DEFAULT_IP
+node_port = DEFAULT_PORT
+node_url = None
 local_controller_url = None
-nodes = [node_url]
+nodes = []
 difficulty = 2
 node_nickname = ""
 network_node = True
@@ -22,6 +28,10 @@ network_node = True
 with open('keys.json', 'r') as f:
     HARDCODED_KEYS = json.load(f)
 
+def set_node_url(ip, port):
+    global node_url, nodes
+    node_url = f"http://{ip}:{port}"
+    nodes = [node_url]
 
 def set_difficulty(new_difficulty):
     global difficulty
@@ -30,12 +40,11 @@ def set_difficulty(new_difficulty):
         return
 
     difficulty = int(new_difficulty)
-
     configuration = {
         'nodes': nodes,
         'master_controller': local_controller_url,
         'difficulty': difficulty,
-        'reset' : 0
+        'reset': 0
     }
     try:
         response = requests.post(f'{node_url}/configure', json=configuration)
@@ -73,7 +82,6 @@ def reset():
     print({'status': 'reset configuration sent to nodes', 'nodes': node_nickname})
 
 def post_transaction(sender, recipient, amount):
-    # Generate signature using sender's private key
     private_key_pem = HARDCODED_KEYS[sender]['private_key']
     private_key = SigningKey.from_pem(private_key_pem)
     transaction_data = f"{sender}{recipient}{amount}".encode()
@@ -87,7 +95,7 @@ def post_transaction(sender, recipient, amount):
             "amount": amount,
             "signature": signature
         },
-        "source" : ""
+        "source": ""
     }
     response = requests.post(url, json=payload)
     print(json.dumps(response.json(), indent=4))
@@ -114,54 +122,59 @@ def get_configuration(show=True):
     if show:
         print(response.json())
 
+def show_info():
+    print(f"Node IP: {node_ip}")
+    print(f"Node Port: {node_port}")
+    print(f"Node URL: {node_url}")
+    print(f"Nickname: {node_nickname}")
+    print(f"Network node: {network_node}")
+
 def create_parser():
-    """Create and return the argparse parser"""
     parser = argparse.ArgumentParser(description="CLI for Master Controller")
+    parser.add_argument("-i", "--ip", type=str, required=True, help="Node IP address")
+    parser.add_argument("-p", "--port", type=int, required=True, help="Node port")
     subparsers = parser.add_subparsers(dest="command")
 
-    # Difficulty command
     set_difficulty_parser = subparsers.add_parser("difficulty", aliases=["d"])
     set_difficulty_parser.add_argument("difficulty", type=int, help="Difficulty level for mining")
 
-    # Reset command
     reset_parser = subparsers.add_parser("reset", aliases=["r"])
 
-    # Transaction command
     trans_parser = subparsers.add_parser("transaction", aliases=["t"])
     trans_parser.add_argument("sender", type=str)
     trans_parser.add_argument("recipient", type=str)
     trans_parser.add_argument("amount", type=int)
 
-    # Transaction command
     send_parser = subparsers.add_parser("send", aliases=["s"])
     send_parser.add_argument("recipient", type=str)
     send_parser.add_argument("amount", type=int)
 
-    # Users command
     subparsers.add_parser("users", aliases=["u"])
     subparsers.add_parser("get_configuration", aliases=["g"])
-
-    # Chain command
     subparsers.add_parser("chain", aliases=["c"])
-
+    subparsers.add_parser("info", help="Show node info")
     subparsers.add_parser("help", aliases=["h"], help="Show this help message and list commands")
 
     return parser
 
-
 def run_cli(args=None):
-    """Execute CLI command from parsed arguments"""
     parser = create_parser()
     args = parser.parse_args(args) if args else parser.parse_args()
+
+    # Set IP and port globally
+    global node_ip, node_port
+    node_ip = args.ip
+    node_port = args.port
+    set_node_url(node_ip, node_port)
 
     if not args.command:
         parser.print_help()
         return
     if args.command in ("help", "h"):
         parser.print_help()
-
-    # Command routing
-    if args.command in ("difficulty", "d"):
+    elif args.command == "info":
+        show_info()
+    elif args.command in ("difficulty", "d"):
         set_difficulty(args.difficulty)
     elif args.command in ("reset", "r"):
         reset()
@@ -179,32 +192,33 @@ def run_cli(args=None):
     elif args.command in ("chain", "c"):
         get_chain()
 
-
 def interactive_prompt():
-    """Start interactive command prompt"""
     parser = create_parser()
+    prompt_base = lambda: f"{node_nickname}@{node_ip}:{node_port}:{'network' if network_node else 'single'}> "
     print("Blockchain CLI (type 'exit' to quit)")
     while True:
         try:
-            # Read input
-            user_input = input(f"{node_nickname}:{'network' if network_node else 'single'}> ").strip()
+            user_input = input(prompt_base()).strip()
             if user_input.lower() in ("exit", "quit"):
                 break
             if not user_input:
                 get_configuration(False)
                 continue
 
-            # Parse and execute
             get_configuration(False)
-            run_cli(shlex.split(user_input))
-
+            # Add IP and port to args for each command
+            run_cli(shlex.split(f"--ip {node_ip} --port {node_port} " + user_input))
         except SystemExit:
-            # Handle argparse errors gracefully
             continue
         except Exception as e:
             print(f"Error: {str(e)}")
 
-
 if __name__ == "__main__":
-    run_cli(shlex.split("g"))
+    # Parse IP and port at startup
+    parser = create_parser()
+    startup_args, _ = parser.parse_known_args()
+    node_ip = startup_args.ip
+    node_port = startup_args.port
+    set_node_url(node_ip, node_port)
+    run_cli(shlex.split(f"--ip {node_ip} --port {node_port} g"))
     interactive_prompt()
