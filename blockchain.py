@@ -172,7 +172,7 @@ class Blockchain:
                     'amount': transaction['amount'],
                     'signature': signature.hex()
                 },
-                'sender': self.nickname
+                'source': self.nickname
             }
             threading.Thread(target=request_task, args=(url, data)).start()
 
