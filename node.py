@@ -74,7 +74,7 @@ def new_transaction():
 
     sender = values['sender']
     transaction = values['transaction']
-    blockchain.new_transaction(
+    valid_transaction = blockchain.new_transaction(
         sender=transaction['sender'],
         recipient=transaction['recipient'],
         amount=transaction['amount'],

@@ -66,11 +66,11 @@ class Blockchain:
         if sender != "Bank":
             if not self.verify_transaction(sender, recipient, amount, signature):
                 self.log(f"Transaction from {sender} to {recipient} for {amount} failed: Invalid signature")
-                return "Invalid signature"
+                return False, "Invalid signature"
 
             if self.users[sender]['balance'] < amount:
                 self.log(f"Transaction from {sender} to {recipient} for {amount} failed: Insufficient funds")
-                return "Insufficient funds"
+                return False, "Insufficient funds"
 
         transaction = {
             'sender': sender,
@@ -90,6 +90,7 @@ class Blockchain:
 
         if len(self.current_transactions) >= 5:
             self.mine()
+        return True, "Success"
 
     def mine(self):
         new_header = {
@@ -164,22 +165,16 @@ class Blockchain:
     def broadcast_new_transaction(self, transaction, signature):
         for node in self.nodes:
             url = f'http://{node}/transactions'
-            try:
-                response = requests.post(url, json={
-                    'transaction': {
-                        'sender': transaction['sender'],
-                        'recipient': transaction['recipient'],
-                        'amount': transaction['amount'],
-                        'signature': signature.hex()
-                    },
-                    'sender': self.nickname
-                })
-                if response.status_code == 201:
-                    self.log(f"Transaction posted to node {node}")
-                else:
-                    self.log(f"Failed to post transaction to node {node}: {response.status_code}")
-            except Exception as e:
-                self.log(f"Error posting transaction to node {node}: {e}")
+            data = {
+                'transaction': {
+                    'sender': transaction['sender'],
+                    'recipient': transaction['recipient'],
+                    'amount': transaction['amount'],
+                    'signature': signature.hex()
+                },
+                'sender': self.nickname
+            }
+            threading.Thread(target=request_task, args=(url, data)).start()
 
     def verify_transaction(self, sender, recipient, amount, signature):
         transaction_data = f"{sender}{recipient}{amount}".encode()
@@ -234,3 +229,10 @@ class Blockchain:
                 requests.post(f'{self.master_controller}/log', json={'message': log_message})
             except Exception as e:
                 print(f"Failed to send log to master controller: {e}")
+
+def request_task(url, json):
+    try:
+        response = requests.post(url, json=json)
+        # Optionally, handle response here if needed
+    except Exception as e:
+        print(f"Error posting transaction to {url}: {e}")

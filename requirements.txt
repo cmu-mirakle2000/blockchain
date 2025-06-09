@@ -2,3 +2,4 @@ Flask
 requests
 ecdsa
 cryptography
+aiohttp
