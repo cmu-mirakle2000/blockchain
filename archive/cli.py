@@ -13,7 +13,7 @@ difficulty = 2
 node_nickname = ""
 
 # Load keys from JSON file
-with open('keys.json', 'r') as f:
+with open('../keys.json', 'r') as f:
     HARDCODED_KEYS = json.load(f)
 
 def set_difficulty(new_difficulty):

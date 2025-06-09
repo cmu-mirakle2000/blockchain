@@ -2,12 +2,22 @@ import argparse
 import requests
 import json
 from ecdsa import SigningKey
+import shlex
+import sys
+
+# Enable command history on Mac/Linux
+try:
+    import readline
+except ImportError:
+    pass  # Skip on Windows
 
 MASTER_CONTROLLER_URL = "http://127.0.0.1:8001"
 
 # Load keys from JSON file
 with open('keys.json', 'r') as f:
     HARDCODED_KEYS = json.load(f)
+
+
 
 
 def post_log(message):
@@ -91,74 +101,114 @@ def get_configuration():
     print(response.json())
 
 
-def main():
-    parser = argparse.ArgumentParser(description="CLI for Master Controller")
+def create_parser():
+    """Create and return the argparse parser"""
+    parser = argparse.ArgumentParser(description="CLI for Master Controller", add_help=False)
     subparsers = parser.add_subparsers(dest="command")
 
-    # Subparser for adding node (alias: a)
-    add_node_parser = subparsers.add_parser("add_node", aliases=["a"])
-    add_node_parser.add_argument("node", type=str, help="URL of the node to add")
+    # Help command
+    help_parser = subparsers.add_parser("help", aliases=["h"], help="Show available commands")
 
-    # Subparser for removing node (alias: r)
-    remove_node_parser = subparsers.add_parser("remove_node", aliases=["r"])
-    remove_node_parser.add_argument("node", type=str, help="URL of the node to remove")
+    # Add node
+    add_parser = subparsers.add_parser("add_node", aliases=["a"])
+    add_parser.add_argument("node", help="Node URL to add")
 
-    # Subparser for setting difficulty (alias: d)
-    set_difficulty_parser = subparsers.add_parser("difficulty", aliases=["d"])
-    set_difficulty_parser.add_argument("difficulty", type=int, help="Difficulty level for mining")
+    # Remove node
+    remove_parser = subparsers.add_parser("remove_node", aliases=["r"])
+    remove_parser.add_argument("node", help="Node URL to remove")
 
-    # Subparser for configuring nodes (alias: c)
-    config_parser = subparsers.add_parser("configure", aliases=["c"])
+    # Difficulty
+    diff_parser = subparsers.add_parser("difficulty", aliases=["d"])
+    diff_parser.add_argument("difficulty", type=int, help="Mining difficulty level")
 
-    # Subparser for resetting nodes (alias: x)
-    reset_parser = subparsers.add_parser("reset", aliases=["x"])
+    # Configure
+    subparsers.add_parser("configure", aliases=["c"])
 
-    # Subparser for posting transaction (alias: t)
+    # Reset
+    subparsers.add_parser("reset", aliases=["x"])
+
+    # Transaction
     trans_parser = subparsers.add_parser("transaction", aliases=["t"])
-    trans_parser.add_argument("nickname", type=str, help="Nickname of the node")
-    trans_parser.add_argument("sender", type=str, help="Sender of the transaction")
+    trans_parser.add_argument("nickname", help="Node nickname")
+    trans_parser.add_argument("sender", help="Transaction sender")
     trans_parser.add_argument("recipient", type=str, help="Recipient of the transaction")
-    trans_parser.add_argument("amount", type=int, help="Amount of the transaction")
+    trans_parser.add_argument("amount", type=int, help="Transaction amount")
 
-    # Subparser for create genesis block (alias: g)
+    # Genesis
     genesis_parser = subparsers.add_parser("genesis", aliases=["g"])
-    genesis_parser.add_argument("nickname", type=str, help="Nickname of the node")
+    genesis_parser.add_argument("nickname", help="Node nickname")
 
-    # Subparser for getting users (alias: u)
+    # Users
     users_parser = subparsers.add_parser("users", aliases=["u"])
-    users_parser.add_argument("nickname", type=str, help="Nickname of the node")
+    users_parser.add_argument("nickname", help="Node nickname")
 
-    # Subparser for getting blockchain (alias: b)
+    # Chain
     chain_parser = subparsers.add_parser("chain", aliases=["b"])
-    chain_parser.add_argument("nickname", type=str, help="Nickname of the node")
+    chain_parser.add_argument("nickname", help="Node nickname")
 
-    # Subparser for getting configuration (alias: f)
-    config_get_parser = subparsers.add_parser("get_configuration", aliases=["f"])
-    args = parser.parse_args()
+    # Configuration
+    subparsers.add_parser("get_configuration", aliases=["f"])
 
-    if args.command == "add_node":
+    return parser
+
+
+def run_command(args):
+    """Execute commands based on parsed arguments"""
+    if args.command in ("help", "h"):
+        create_parser().print_help()
+        return
+
+    if args.command in ("add_node", "a"):
         add_node(args.node)
-    elif args.command == "remove_node":
+    elif args.command in ("remove_node", "r"):
         remove_node(args.node)
-    elif args.command == "difficulty":
+    elif args.command in ("difficulty", "d"):
         set_difficulty(args.difficulty)
-    elif args.command == "configure":
+    elif args.command in ("configure", "c"):
         configure()
-    elif args.command == "reset":
+    elif args.command in ("reset", "x"):
         reset()
-    elif args.command == "transaction":
+    elif args.command in ("transaction", "t"):
         post_transaction(args.nickname, args.sender, args.recipient, args.amount)
-    elif args.command == "users":
+    elif args.command in ("users", "u"):
         get_users(args.nickname)
-    elif args.command == "chain":
+    elif args.command in ("chain", "b"):
         get_chain(args.nickname)
-    elif args.command == "genesis":
+    elif args.command in ("genesis", "g"):
         genesis(args.nickname)
-    elif args.command == "get_configuration":
+    elif args.command in ("get_configuration", "f"):
         get_configuration()
-    else:
-        parser.print_help()
+
+
+def interactive_prompt():
+    """Start interactive command prompt with history"""
+    parser = create_parser()
+    print("Blockchain Controller CLI - Type 'help' for commands, 'exit' to quit")
+
+    while True:
+        try:
+            user_input = input("> ").strip()
+            if user_input.lower() in ("exit", "quit"):
+                break
+            if not user_input:
+                continue
+
+            # Parse input
+            parsed_args = parser.parse_args(shlex.split(user_input))
+            run_command(parsed_args)
+
+        except SystemExit:
+            # Handle argparse errors gracefully
+            continue
+        except Exception as e:
+            print(f"Error: {str(e)}")
 
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) > 1:
+        # Command line mode
+        args = create_parser().parse_args()
+        run_command(args)
+    else:
+        # Interactive mode
+        interactive_prompt()

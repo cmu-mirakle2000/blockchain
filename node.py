@@ -38,6 +38,21 @@ def configure():
 
 
 
+@app.route('/configuration', methods=['GET'])
+def get_configuration():
+
+    response = {
+        'message': 'Configuration updated',
+        'total_nodes': list(blockchain.nodes),
+        'master_controller': blockchain.master_controller,
+        'difficulty': blockchain.difficulty,
+        'nickname': blockchain.nickname,
+        'network_node': blockchain.network_node
+    }
+    return jsonify(response), 201
+
+
+
 @app.route('/mine', methods=['GET'])
 def mine():
     last_block = blockchain.last_block
