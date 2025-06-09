@@ -70,11 +70,10 @@ python mcli.py configure
 - `sender` (str): The sender of the transaction.
 - `recipient` (str): The recipient of the transaction.
 - `amount` (int): The amount of the transaction.
-- `signature` (str): The signature of the transaction.
 
 **Example**:
 ```sh
-python mcli.py post_transaction Node1 Alice Bob 100 signature_hex
+python mcli.py post_transaction Node1 Alice Bob 100 
 ```
 
 ### 6. Get Users
