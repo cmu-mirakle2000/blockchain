@@ -68,11 +68,11 @@ def mine():
 def new_transaction():
     values = request.get_json()
 
-    required = ['transaction', 'sender']
+    required = ['transaction', 'source']
     if not all(k in values for k in required):
         return 'Missing values', 400
 
-    sender = values['sender']
+    source = values['source']
     transaction = values['transaction']
     valid_transaction, validation_message = blockchain.new_transaction(
         sender=transaction['sender'],
@@ -80,7 +80,7 @@ def new_transaction():
         amount=transaction['amount'],
         signature=bytes.fromhex(transaction['signature']),
         # broadcast=True if sender == 'MasterController' else False
-        broadcast=True if network_node and sender=="" else False
+        broadcast=True if network_node and source=="" else False
     )
 
     if not valid_transaction:

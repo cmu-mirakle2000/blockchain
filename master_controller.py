@@ -171,7 +171,7 @@ def post_transaction(nickname):
 
     try:
         response = requests.post(f'{node_url}/transactions',
-                                 json={'transaction': transaction, 'sender': 'MasterController'})
+                                 json={'transaction': transaction, 'source': 'MasterController'})
         if response.status_code == 201:
             return jsonify({'status': 'Transaction posted'}), 201
         else:

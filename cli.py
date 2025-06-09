@@ -73,7 +73,7 @@ def post_transaction(sender, recipient, amount):
             "amount": amount,
             "signature": signature
         },
-        "sender" : node_nickname
+        "source" : node_nickname
     }
     response = requests.post(url, json=payload)
     print(json.dumps(response.json(), indent=4))
