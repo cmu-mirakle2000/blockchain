@@ -74,7 +74,7 @@ def new_transaction():
 
     sender = values['sender']
     transaction = values['transaction']
-    valid_transaction = blockchain.new_transaction(
+    valid_transaction, validation_message = blockchain.new_transaction(
         sender=transaction['sender'],
         recipient=transaction['recipient'],
         amount=transaction['amount'],
@@ -82,6 +82,9 @@ def new_transaction():
         # broadcast=True if sender == 'MasterController' else False
         broadcast=True if network_node and sender=="" else False
     )
+
+    if not valid_transaction:
+        return jsonify(f'Invalid transaction: {validation_message}'), 400
 
     response = {'message': f'Transaction will be added to next Block'}
     return jsonify(response), 201

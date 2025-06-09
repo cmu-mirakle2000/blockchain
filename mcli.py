@@ -95,46 +95,45 @@ def main():
     parser = argparse.ArgumentParser(description="CLI for Master Controller")
     subparsers = parser.add_subparsers(dest="command")
 
-    # Subparser for adding node
-    add_node_parser = subparsers.add_parser("add_node")
+    # Subparser for adding node (alias: a)
+    add_node_parser = subparsers.add_parser("add_node", aliases=["a"])
     add_node_parser.add_argument("node", type=str, help="URL of the node to add")
 
-    # Subparser for removing node
-    add_node_parser = subparsers.add_parser("remove_node")
-    add_node_parser.add_argument("node", type=str, help="URL of the node to remove")
+    # Subparser for removing node (alias: r)
+    remove_node_parser = subparsers.add_parser("remove_node", aliases=["r"])
+    remove_node_parser.add_argument("node", type=str, help="URL of the node to remove")
 
-    # Subparser for setting difficulty
-    set_difficulty_parser = subparsers.add_parser("difficulty")
+    # Subparser for setting difficulty (alias: d)
+    set_difficulty_parser = subparsers.add_parser("difficulty", aliases=["d"])
     set_difficulty_parser.add_argument("difficulty", type=int, help="Difficulty level for mining")
 
-    # Subparser for configuring nodes
-    config_parser = subparsers.add_parser("configure")
+    # Subparser for configuring nodes (alias: c)
+    config_parser = subparsers.add_parser("configure", aliases=["c"])
 
-    # Subparser for resetting nodes
-    config_parser = subparsers.add_parser("reset")
+    # Subparser for resetting nodes (alias: x)
+    reset_parser = subparsers.add_parser("reset", aliases=["x"])
 
-    # Subparser for posting transaction
-    trans_parser = subparsers.add_parser("transaction")
+    # Subparser for posting transaction (alias: t)
+    trans_parser = subparsers.add_parser("transaction", aliases=["t"])
     trans_parser.add_argument("nickname", type=str, help="Nickname of the node")
     trans_parser.add_argument("sender", type=str, help="Sender of the transaction")
     trans_parser.add_argument("recipient", type=str, help="Recipient of the transaction")
     trans_parser.add_argument("amount", type=int, help="Amount of the transaction")
 
-    # Subparser for create genesis block
-    users_parser = subparsers.add_parser("genesis")
+    # Subparser for create genesis block (alias: g)
+    genesis_parser = subparsers.add_parser("genesis", aliases=["g"])
+    genesis_parser.add_argument("nickname", type=str, help="Nickname of the node")
+
+    # Subparser for getting users (alias: u)
+    users_parser = subparsers.add_parser("users", aliases=["u"])
     users_parser.add_argument("nickname", type=str, help="Nickname of the node")
 
-    # Subparser for getting users
-    users_parser = subparsers.add_parser("users")
-    users_parser.add_argument("nickname", type=str, help="Nickname of the node")
-
-    # Subparser for getting blockchain
-    chain_parser = subparsers.add_parser("chain")
+    # Subparser for getting blockchain (alias: b)
+    chain_parser = subparsers.add_parser("chain", aliases=["b"])
     chain_parser.add_argument("nickname", type=str, help="Nickname of the node")
 
-    # Subparser for getting configuration
-    config_get_parser = subparsers.add_parser("get_configuration")
-
+    # Subparser for getting configuration (alias: f)
+    config_get_parser = subparsers.add_parser("get_configuration", aliases=["f"])
     args = parser.parse_args()
 
     if args.command == "add_node":

@@ -97,24 +97,24 @@ def main():
     parser = argparse.ArgumentParser(description="CLI for Master Controller")
     subparsers = parser.add_subparsers(dest="command")
 
-    # Subparser for setting difficulty
-    set_difficulty_parser = subparsers.add_parser("difficulty")
+    # Subparser for setting difficulty (alias: 'diff')
+    set_difficulty_parser = subparsers.add_parser("difficulty", aliases=["d"])
     set_difficulty_parser.add_argument("difficulty", type=int, help="Difficulty level for mining")
 
-    # Subparser for configuring nodes
-    config_parser = subparsers.add_parser("reset")
+    # Subparser for configuring nodes (alias: 'rst')
+    config_parser = subparsers.add_parser("reset", aliases=["r"])
 
-    # Subparser for posting transaction
-    trans_parser = subparsers.add_parser("transaction")
+    # Subparser for posting transaction (alias: 'tx')
+    trans_parser = subparsers.add_parser("transaction", aliases=["t"])
     trans_parser.add_argument("sender", type=str, help="Sender of the transaction")
     trans_parser.add_argument("recipient", type=str, help="Recipient of the transaction")
     trans_parser.add_argument("amount", type=int, help="Amount of the transaction")
 
     # Subparser for getting users
-    users_parser = subparsers.add_parser("users")
+    users_parser = subparsers.add_parser("users", aliases=["u"])
 
     # Subparser for getting blockchain
-    chain_parser = subparsers.add_parser("chain")
+    chain_parser = subparsers.add_parser("chain", aliases=["c"])
 
     args = parser.parse_args()
 
