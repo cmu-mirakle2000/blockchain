@@ -6,7 +6,7 @@ This documentation provides information on how to use the command line interface
 ## Usage
 
 ```
-python cli.py <command> [arguments]
+python main-client.py 
 ```
 
 ## Commands
@@ -34,12 +34,12 @@ python mcli.py post_log "This is a log message"
 
 **Example**:
 ```sh
-python mcli.py add_node "http://localhost:5001"
+add_node "http://localhost:5001"
 ```
 
 ### 3. Set Difficulty
 
-**Command**: `set_difficulty`  
+**Command**: `difficulty`  
 **Description**: Sets the mining difficulty for the nodes.
 
 **Arguments**:
@@ -47,7 +47,7 @@ python mcli.py add_node "http://localhost:5001"
 
 **Example**:
 ```sh
-python mcli.py set_difficulty 4
+difficulty 4
 ```
 
 ### 4. Configure
@@ -57,12 +57,12 @@ python mcli.py set_difficulty 4
 
 **Example**:
 ```sh
-python mcli.py configure
+configure
 ```
 
 ### 5. Post Transaction
 
-**Command**: `post_transaction`  
+**Command**: `transaction`  
 **Description**: Posts a transaction to a specific node using its nickname.
 
 **Arguments**:
@@ -73,12 +73,12 @@ python mcli.py configure
 
 **Example**:
 ```sh
-python mcli.py post_transaction Node1 Alice Bob 100 
+transaction Node1 Alice Bob 100 
 ```
 
 ### 6. Get Users
 
-**Command**: `get_users`  
+**Command**: `users`  
 **Description**: Retrieves the list of users from a specific node using its nickname.
 
 **Arguments**:
@@ -86,12 +86,12 @@ python mcli.py post_transaction Node1 Alice Bob 100
 
 **Example**:
 ```sh
-python mcli.py get_users Node1
+users Node1
 ```
 
 ### 7. Get Blockchain
 
-**Command**: `get_chain`  
+**Command**: `chain`  
 **Description**: Retrieves the full blockchain from a specific node using its nickname.
 
 **Arguments**:
@@ -99,7 +99,7 @@ python mcli.py get_users Node1
 
 **Example**:
 ```sh
-python mcli.py get_chain Node1
+chain Node1
 ```
 
 ### 8. Get Configuration
@@ -109,5 +109,5 @@ python mcli.py get_chain Node1
 
 **Example**:
 ```sh
-python mcli.py get_configuration
+get_configuration
 ```
