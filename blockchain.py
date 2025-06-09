@@ -7,6 +7,10 @@ import json
 import threading
 import hashlib
 
+BOOTSTRAP_NODES = [
+    "127.0.0.1:8002"
+]
+
 # Load keys from JSON file
 with open('keys.json', 'r') as f:
     HARDCODED_KEYS = json.load(f)
@@ -25,8 +29,83 @@ class Blockchain:
         self.master_controller = None
         self.difficulty = 2
 
+        if network_node and BOOTSTRAP_NODES:
+            self.synchronize_with_network()
+        elif network_node and not BOOTSTRAP_NODES:
+            self.log("No bootstrap nodes configured; skipping network sync.")
+
         # Comment out genesis block creation, will be handled manually
         # self.new_block(previous_hash='1', proof=100)
+
+    def synchronize_with_network(self):
+        """Fetch and replace chain from bootstrap nodes if valid"""
+        self.log("Starting network synchronization...")
+
+        for node in BOOTSTRAP_NODES:
+            if node == self.node_address:
+                self.log(f"Skipping self-sync with {node}")
+                continue
+            try:
+                response = requests.get(f'http://{node}/chain', timeout=5)
+                if response.status_code == 200:
+                    remote_chain = response.json().get('chain', [])
+
+                    # Validate using raw dictionary data
+                    if self.valid_chain(remote_chain):
+                        # Now convert to Block objects
+                        self.chain = [
+                            Block(
+                                index=block['header']['index'],
+                                timestamp=block['header']['timestamp'],
+                                transactions=block['transactions'],
+                                nonce=block['header']['nonce'],
+                                previous_hash=block['header']['previous_hash'],
+                                merkle_root=block['header']['merkle_root'],
+                                header=block['header']
+                            ) for block in remote_chain
+                        ]
+                        self.log(f"Synchronized chain from {node} (length: {len(self.chain)})")
+                        return True
+            except Exception as e:
+                self.log(f"Failed to sync from {node}: {str(e)}")
+
+        self.log("Could not synchronize with bootstrap nodes")
+        return False
+
+    def valid_chain(self, chain):
+        """
+        Verify a received chain is valid (works with dicts or Block objects)
+        """
+        prev_block = chain[0]
+        current_index = 1
+
+        while current_index < len(chain):
+            current_block = chain[current_index]
+
+            # Handle both dict and Block object formats
+            calculated_prev_hash = Block.hash(prev_block)
+
+            if isinstance(current_block, dict):
+                current_prev_hash = current_block['header']['previous_hash']
+                current_nonce = current_block['header']['nonce']
+                current_header = current_block['header']
+            else:
+                current_prev_hash = current_block.previous_hash
+                current_nonce = current_block.nonce
+                current_header = current_block.header
+
+            # Check hash linkage
+            if current_prev_hash != calculated_prev_hash:
+                return False
+
+            # Validate proof of work
+            if not self.valid_proof(current_header, current_nonce):
+                return False
+
+            prev_block = current_block
+            current_index += 1
+
+        return True
 
     def create_users(self):
         users = {user: {'balance': 1000} for user in HARDCODED_KEYS.keys()}
@@ -207,6 +286,11 @@ class Blockchain:
         self.nodes = set()
         for node in nodes:
             self.register_node(node)
+
+        if self.network_node and BOOTSTRAP_NODES:
+            self.synchronize_with_network()
+        elif self.network_node and not BOOTSTRAP_NODES:
+            self.log("No bootstrap nodes configured; skipping network sync.")
 
         self.log(f"Blockchain {'reset and ' if reset == 1 else ''}reconfigured with difficulty {difficulty}")
 

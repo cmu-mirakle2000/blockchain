@@ -3,14 +3,23 @@ import json
 
 
 class Block:
-    def __init__(self, index, timestamp, transactions, nonce, previous_hash, merkle_root):
-        self.header = {
-            'index': index,
-            'timestamp': timestamp,
-            'nonce': nonce,
-            'previous_hash': previous_hash,
-            'merkle_root': merkle_root
-        }
+    def __init__(self, index, timestamp, transactions, nonce, previous_hash, merkle_root, header=None):
+        if header:
+            self.header = {
+                'index': header.get('index'),
+                'timestamp': header.get('timestamp'),
+                'nonce': header.get('nonce'),
+                'previous_hash': header.get('previous_hash'),
+                'merkle_root': header.get('merkle_root')
+            }
+        else:
+            self.header = {
+                'index': index,
+                'timestamp': timestamp,
+                'nonce': nonce,
+                'previous_hash': previous_hash,
+                'merkle_root': merkle_root
+            }
         self.transactions = transactions
 
     def to_dict(self):
@@ -39,8 +48,18 @@ class Block:
 
     @staticmethod
     def hash(block):
-        block_string = json.dumps(block.header_to_dict(), sort_keys=True).encode()
-        return hashlib.sha256(block_string).hexdigest()
+        """Serialize block header for hashing, handling both Block objects and dicts"""
+        if isinstance(block, dict):
+            # Extract header from dictionary format
+            header = block.get('header', {})
+        elif isinstance(block, Block):
+            # Get header from Block object
+            header = block.header_to_dict()
+        else:
+            raise ValueError("Unsupported block type")
+
+        # Serialize header for hashing
+        return json.dumps(header, sort_keys=True).encode()
 
     @staticmethod
     def merkle_root(transactions):
