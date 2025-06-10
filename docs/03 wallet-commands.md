@@ -1,31 +1,28 @@
-
-
+You can use the Wallet app to send commands to the server. 
 
 ### Step 1: Start Interactive Wallet
 
 
-1. **Open a new Terminal window on your computer and start interactive shell**
-   
+1. **Open a new Terminal window on your server and start interactive shell**
+
+(You can also connect to a remote server from your laptop. You just need to clone the repository to your laptop as well and follow the deployment commands to get your virtual environment working)
+
    Switch to your project folder
       ```bash
       cd blockchain
       source venv/bin/activate
       ```
 
-2. **Edit wallet.py and update the following line to match your node's URL**
-
+2**Start your interactive wallet** 
+Specify the IP address and port number of your node server on the remote machine. 
    ```bash
-     node_url = "http://127.0.0.1:8004"
-   ```
-3. **Start your interactive wallet** 
-   ```bash
-     python wallet.py
+     python wallet.py -i <ip-adress> -p <port>
    ```
 
-4. **You will see a prompt along with the network status**
+4. **You will see a prompt along with the network status and IP details**
 
       ```bash
-      NodeName:single> 
+      NodeName@127.0.0.1:5000:single> 
       ```
    Type `help` to see a list of available commands. Every command has a single letter shortcut listed right after it. 
 

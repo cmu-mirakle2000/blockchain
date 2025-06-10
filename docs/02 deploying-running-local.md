@@ -45,9 +45,12 @@
 
 Replace `YourName` with your name from the `keys.json` file
 
-For type, use `single` or `network`. For initial tests, use `single`
+For type, use `single` or `network`. For initial tests, use `single`. For running on a remote server, 
+use the public IP address of the remote server. Make sure you opened the firewall for the port you choose. 
  
    ```bash
      cd app
-     python node.py <type> <YourName>
+     python node.py <type> <YourName> -i <ip-address> -p <port>
+     # Example
+     python node.py single John -i 127.0.0.1 -p 5000
    ```
