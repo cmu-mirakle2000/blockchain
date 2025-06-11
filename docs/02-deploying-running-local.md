@@ -13,17 +13,20 @@
 
 ### Step 2: Set Up the Environment
 1. **Update the package list and install required packages**:
+
+You only need to do this once, but it doesn't hurt if you run it every time. 
    ```bash
    sudo yum install python3-pip python3 nginx git
    ```
    
 2. **Install virtualenv**:
+You only need to do this once, but it doesn't hurt if you run it every time. 
    ```bash
    sudo pip3 install virtualenv
    ```
 
 ### Step 3: Set Up the Flask Application
-1. **Clone your Flask application repository or create a new one**:
+1. **Clone your Flask application repository**:
    ```bash
    git clone https://github.com/cmu-mirakle2000/blockchain.git
    cd blockchain
